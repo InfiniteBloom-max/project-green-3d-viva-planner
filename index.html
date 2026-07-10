@@ -12,8 +12,8 @@
     }
     *{box-sizing:border-box}
     html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#dff5e8;color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-    #app{position:fixed;inset:0;display:grid;place-items:center}
-    #app .placeholder{opacity:.55;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    #app{position:fixed;inset:0}
+    canvas{display:block}
     .topbar{
       position:fixed;left:16px;right:16px;top:14px;z-index:12;display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none
     }
@@ -45,55 +45,136 @@
     button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
     button.active{background:var(--green);color:#fff;border-color:var(--green)}
     button.wide{grid-column:1/-1}
-    .timeline{
-      position:fixed;right:16px;top:96px;width:min(390px,calc(100vw - 348px));max-height:calc(100vh - 112px);overflow:auto;z-index:12;
-      background:var(--panel);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.95);
-      border-radius:22px;box-shadow:var(--shadow);padding:16px
-    }
-    .timeline h2{margin:0 0 9px;font-size:13px;text-transform:uppercase;letter-spacing:.12em}
     .footerNote{margin-top:10px;font-size:11px;line-height:1.42;opacity:.68}
+    .hint{
+      position:fixed;left:50%;bottom:15px;transform:translateX(-50%);background:rgba(11,32,23,.83);color:#fff;
+      font-size:11px;padding:8px 12px;border-radius:999px;z-index:8;pointer-events:none
+    }
   </style>
 </head>
 <body>
-<div id="app"><div class="placeholder">3D room scene loading next…</div></div>
-
+<div id="app"></div>
 <div class="topbar">
   <div class="brand">
     <div class="logo">G</div>
     <div>
       <h1>PROJECT GREEN — 3D VIVA REHEARSAL PLANNER</h1>
-      <p>Slides, posters, five presenters and a timelapse walkthrough</p>
+      <p>Building the 3D room shell…</p>
     </div>
   </div>
   <div class="speakerCard">
     <div class="eyebrow">Current presenter</div>
     <div class="name" id="speakerName">—</div>
-    <div class="detail" id="speakerDetail">Select a speaker or timeline step</div>
+    <div class="detail" id="speakerDetail">Room geometry only</div>
   </div>
 </div>
-
 <aside class="sidebar">
   <h2>Camera views</h2>
   <div class="grid">
     <button data-view="iso" class="active">Isometric</button>
     <button data-view="top">Top plan</button>
-    <button data-view="presenter">Presenter</button>
     <button data-view="panel">Panel view</button>
     <button data-view="screen">Projector wall</button>
   </div>
-  <h3>Timelapse controls</h3>
-  <div class="grid">
-    <button id="playAll" class="primary wide">▶ Play full timelapse</button>
-    <button id="nextStep">Next step</button>
-    <button id="resetScene">Reset</button>
-  </div>
-  <div class="footerNote">UI shell only — Three.js scene lands next.</div>
+  <div class="footerNote">Drag to orbit · Scroll to zoom · Right-drag to pan.</div>
 </aside>
+<div class="hint">Drag to rotate · Scroll to zoom</div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-<aside class="timeline">
-  <h2>Presentation flow</h2>
-  <div class="stepList" id="stepList"></div>
-  <div class="footerNote">Timeline steps will be wired once scene + slide data are in place.</div>
-</aside>
+const app = document.getElementById('app');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xdff5e8);
+scene.fog = new THREE.Fog(0xdff5e8, 25, 44);
+
+const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(18, 15, 20);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+app.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = .06;
+controls.target.set(0, 1.6, 0);
+controls.maxPolarAngle = Math.PI * .49;
+controls.minDistance = 7;
+controls.maxDistance = 40;
+
+const colors = {
+  ink:0x0b2017, wall:0xf7f2e8, floor:0xd8b887, green:0x20925d, mint:0x75d9a7,
+  gold:0xefc44f, orchid:0xa66bd2, coral:0xdf6b70, sky:0x4da4de, white:0xffffff, darkWood:0x61402e
+};
+
+function mat(color, rough=.72, metal=.05) {
+  return new THREE.MeshStandardMaterial({color, roughness:rough, metalness:metal});
+}
+function box(size, pos, color, parent=scene, rot=[0,0,0]) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(...size), mat(color));
+  m.position.set(...pos); m.rotation.set(...rot); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+
+const room = new THREE.Group();
+scene.add(room);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x95b49f, 2.0));
+const sun = new THREE.DirectionalLight(0xffffff, 2.25);
+sun.position.set(9, 16, 10); sun.castShadow = true; sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-20; sun.shadow.camera.right=20; sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
+scene.add(sun);
+
+// floor + walls
+box([18,.3,14],[0,-.15,0],colors.floor,room);
+box([18,6,.28],[0,3,-7],colors.wall,room);
+box([.28,6,14],[-9,3,0],colors.wall,room);
+box([.28,6,14],[9,3,0],colors.wall,room);
+box([18,.15,.45],[0,5.75,-6.8],colors.green,room);
+box([.45,.15,14],[-8.8,5.75,0],colors.green,room);
+box([.45,.15,14],[8.8,5.75,0],colors.green,room);
+box([11,.25,2.1],[0,.12,-5.75],0x365a48,room);
+
+const views = {
+  iso:{pos:[18,15,20], target:[0,1.5,0]},
+  top:{pos:[0,25,.01], target:[0,0,0]},
+  panel:{pos:[0,3.1,6.9], target:[0,2.2,-5.8]},
+  screen:{pos:[0,5.0,7.8], target:[0,2.8,-6.6]}
+};
+
+function setView(key){
+  const v = views[key];
+  if(!v) return;
+  camera.position.set(...v.pos);
+  controls.target.set(...v.target);
+  document.querySelectorAll('[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view===key));
+}
+document.querySelectorAll('[data-view]').forEach(btn => btn.addEventListener('click',()=>setView(btn.dataset.view)));
+
+window.addEventListener('resize', ()=> {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+setView('iso');
+</script>
 </body>
 </html>
