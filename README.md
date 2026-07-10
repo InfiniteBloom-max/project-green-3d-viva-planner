@@ -1,20 +1,27 @@
 # Project Green — 3D Viva Rehearsal Planner
 
-Interactive Three.js rehearsal scene for the **Project Green** viva: slides, posters, five presenters, and a full presentation timelapse in one room.
+<p align="center">
+  Interactive Three.js rehearsal scene for the <b>Project Green</b> viva:<br/>
+  slides, posters, five presenters, and a full presentation timelapse in one room.
+</p>
 
-[![Live demo](https://img.shields.io/badge/Live%20demo-GitHub%20Pages-20925d?style=for-the-badge)](https://infinitebloom-max.github.io/project-green-3d-viva-planner/)
-![Three.js](https://img.shields.io/badge/Three.js-0.160-black)
-![License](https://img.shields.io/badge/license-MIT-blue)
+<p align="center">
+  <a href="https://infinitebloom-max.github.io/project-green-3d-viva-planner/"><img src="https://img.shields.io/badge/Live%20demo-GitHub%20Pages-20925d?style=for-the-badge" alt="Live demo" /></a>
+  <img src="https://img.shields.io/badge/Three.js-0.160-black?style=for-the-badge" alt="Three.js" />
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License" />
+</p>
 
-## Live site
-
-**https://infinitebloom-max.github.io/project-green-3d-viva-planner/**
+<p align="center">
+  <b>Live site:</b> <a href="https://infinitebloom-max.github.io/project-green-3d-viva-planner/">https://infinitebloom-max.github.io/project-green-3d-viva-planner/</a>
+</p>
 
 ---
 
 ## Demo video
 
-Full walkthrough of the 3D viva rehearsal planner (autoplays in the README):
+<p align="center">
+  Full walkthrough of the 3D viva rehearsal planner (autoplays below)
+</p>
 
 <p align="center">
   <img src="docs/demo/walkthrough.gif" alt="Project Green 3D viva rehearsal planner walkthrough" width="100%" />
