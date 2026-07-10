@@ -45,40 +45,118 @@
     button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
     button.active{background:var(--green);color:#fff;border-color:var(--green)}
     button.wide{grid-column:1/-1}
+    .speakerList{display:grid;gap:8px}
+    .speakerBtn{display:flex;align-items:flex-start;gap:8px;text-align:left;padding:10px}
+    .speakerSwatch{width:10px;height:10px;border-radius:50%;flex:0 0 auto;margin-top:4px}
+    .speakerMeta strong{display:block;font-size:12px}
+    .speakerMeta span{display:block;font-size:11px;opacity:.7;line-height:1.35}
+    .timeline{
+      position:fixed;right:16px;top:96px;width:min(390px,calc(100vw - 348px));max-height:calc(100vh - 112px);overflow:auto;z-index:12;
+      background:var(--panel);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.95);
+      border-radius:22px;box-shadow:var(--shadow);padding:16px
+    }
+    .timeline h2{margin:0 0 9px;font-size:13px;text-transform:uppercase;letter-spacing:.12em}
+    .stepList{display:grid;gap:9px}
+    .step{
+      border:1px solid var(--line);background:white;border-radius:14px;padding:10px 11px;cursor:pointer;
+      transition:.18s ease
+    }
+    .step:hover{transform:translateY(-1px)}
+    .step.active{border-color:rgba(32,146,93,.5);box-shadow:0 10px 18px rgba(12,36,26,.07)}
+    .step .time{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.58;font-weight:800}
+    .step .title{font-size:13px;font-weight:900;margin:3px 0}
+    .step .desc{font-size:11px;line-height:1.42;opacity:.7}
+    .controlsRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
     .footerNote{margin-top:10px;font-size:11px;line-height:1.42;opacity:.68}
     .hint{
       position:fixed;left:50%;bottom:15px;transform:translateX(-50%);background:rgba(11,32,23,.83);color:#fff;
       font-size:11px;padding:8px 12px;border-radius:999px;z-index:8;pointer-events:none
     }
+    .miniProgress{margin-top:10px;height:6px;background:rgba(11,32,23,.1);border-radius:999px;overflow:hidden;display:none}
+    .miniProgress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .25s linear}
+    @media (max-width:1180px){
+      .timeline{width:340px}
+    }
+    @media (max-width:980px){
+      .timeline{display:none}
+      .speakerCard{display:none}
+      .brand{max-width:calc(100vw - 32px)}
+    }
+    @media (max-width:720px){
+      .sidebar{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:44vh}
+      .topbar{left:10px;right:10px;top:10px}
+      .brand p{display:none}
+      .hint{display:none}
+    }
   </style>
 </head>
 <body>
 <div id="app"></div>
+
 <div class="topbar">
   <div class="brand">
     <div class="logo">G</div>
     <div>
       <h1>PROJECT GREEN — 3D VIVA REHEARSAL PLANNER</h1>
-      <p>Building the 3D room shell…</p>
+      <p>Slides, posters, five presenters and a timelapse walkthrough in one interactive rehearsal scene</p>
     </div>
   </div>
   <div class="speakerCard">
     <div class="eyebrow">Current presenter</div>
-    <div class="name" id="speakerName">—</div>
-    <div class="detail" id="speakerDetail">Room geometry only</div>
+    <div class="name" id="speakerName">Sithum Nimhan</div>
+    <div class="detail" id="speakerDetail">Slides 1–4 · Opening, problem, objectives and scope</div>
   </div>
 </div>
+
 <aside class="sidebar">
   <h2>Camera views</h2>
   <div class="grid">
     <button data-view="iso" class="active">Isometric</button>
     <button data-view="top">Top plan</button>
+    <button data-view="presenter">Presenter</button>
     <button data-view="panel">Panel view</button>
     <button data-view="screen">Projector wall</button>
   </div>
-  <div class="footerNote">Drag to orbit · Scroll to zoom · Right-drag to pan.</div>
+
+  <h3>Presenters</h3>
+  <div class="speakerList" id="speakerButtons"></div>
+
+  <h3>Timelapse controls</h3>
+  <div class="grid">
+    <button id="playAll" class="primary wide">▶ Play full timelapse</button>
+    <button id="nextStep">Next step</button>
+    <button id="resetScene">Reset</button>
+  </div>
+  <div class="miniProgress" id="progress"><span></span></div>
+
+  <h3>Scene toggles</h3>
+  <div class="grid">
+    <button id="labelsBtn" class="active">Labels on</button>
+    <button id="beamBtn" class="active">Beam on</button>
+    <button id="pathBtn" class="active">Path on</button>
+    <button id="namesBtn" class="active">Names on</button>
+  </div>
+
+  <div class="footerNote">
+    Drag to orbit · Scroll to zoom · Right-drag to pan.<br>
+    The screen shows the active slide, the correct poster is highlighted, and the non-active presenters wait at the side zones. Play the full timelapse to step through every presenter, slide and poster focus in sequence.
+  </div>
 </aside>
-<div class="hint">Drag to rotate · Scroll to zoom</div>
+
+<aside class="timeline">
+  <h2>Presentation flow</h2>
+  <div class="stepList" id="stepList"></div>
+  <div class="controlsRow">
+    <button id="focusScreen">Focus screen</button>
+    <button id="focusPanel">Focus panel</button>
+  </div>
+  <div class="footerNote">
+    Use these steps to rehearse who speaks, where they stand, which slides appear, and when each poster becomes the visual focus.
+  </div>
+</aside>
+
+<div class="hint">Drag to rotate · Scroll to zoom · Click a presentation step to jump there</div>
+
 <script type="importmap">
 {
   "imports": {
@@ -87,6 +165,7 @@
   }
 }
 </script>
+
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -119,6 +198,45 @@ const colors = {
   gold:0xefc44f, orchid:0xa66bd2, coral:0xdf6b70, sky:0x4da4de, white:0xffffff, darkWood:0x61402e
 };
 
+const presenters = [
+  {id:'sithum', name:'Sithum Nimhan', slides:[1,4], role:'Opening, problem, objectives and scope', color:0x4da4de, pos:[-3.2,0,-3.35], focus:'screen'},
+  {id:'nadeera', name:'Nadeera Prabhash', slides:[5,9], role:'Methodology, WBS, Gantt, CPM and evidence', color:0x20925d, pos:[-5.65,0,-4.65], focus:'plan'},
+  {id:'rashandi', name:'Rashandi Tharushika', slides:[10,12], role:'Budget, EVM, variance and recovery', color:0xefc44f, pos:[5.65,0,-4.65], focus:'control'},
+  {id:'yasali', name:'Yasali Sarajika', slides:[13,14], role:'Quality, risks and issue handling', color:0xa66bd2, pos:[4.1,0,-2.05], focus:'control'},
+  {id:'ronith', name:'Ronith Rashmikara', slides:[15,18], role:'Success criteria, lessons, launch video and closing', color:0xdf6b70, pos:[0,0,-3.4], focus:'screen'}
+];
+
+const steps = [
+  {speaker:'sithum', slide:1, time:'0:00–1:00', title:'Cold opening + title', desc:'Introduce Project Green with the business problem and title slide.'},
+  {speaker:'sithum', slide:2, time:'1:00–2:00', title:'The client problem', desc:'Explain the chaos: manual orders, notebook and no control.'},
+  {speaker:'sithum', slide:3, time:'2:00–3:00', title:'SMART objectives', desc:'State the three measurable objectives and the 45-day target.'},
+  {speaker:'sithum', slide:4, time:'3:00–5:00', title:'Scope boundary', desc:'Explain MVP scope versus deferred enhancements.'},
+  {speaker:'nadeera', slide:5, time:'5:00–5:45', title:'Hybrid methodology', desc:'Waterfall spine, Agile heart.'},
+  {speaker:'nadeera', slide:6, time:'5:45–7:15', title:'Reveal Plan Wall poster', desc:'Walk to Poster 1 and explain the WBS.'},
+  {speaker:'nadeera', slide:7, time:'7:15–8:30', title:'Gantt baseline', desc:'Discuss milestones and schedule control.'},
+  {speaker:'nadeera', slide:8, time:'8:30–9:45', title:'Critical path', desc:'Show the path that could not slip and the available float.'},
+  {speaker:'nadeera', slide:9, time:'9:45–11:00', title:'Execution evidence', desc:'Link planning to daily visible work.'},
+  {speaker:'rashandi', slide:10, time:'11:00–12:00', title:'Budget baseline', desc:'Introduce BAC, planned effort and cost model.'},
+  {speaker:'rashandi', slide:11, time:'12:00–14:00', title:'Reveal Control Room poster', desc:'Walk to Poster 2 and explain the S-curve at Week 5.'},
+  {speaker:'rashandi', slide:12, time:'14:00–17:30', title:'Variance + recovery', desc:'Interpret CPI, SPI, EAC, VAC and the recovery decisions.'},
+  {speaker:'yasali', slide:13, time:'17:30–19:00', title:'Quality assurance and control', desc:'Present 30/30 audit fixes and 11/11 verification tests.'},
+  {speaker:'yasali', slide:14, time:'19:00–21:30', title:'Risk heat map', desc:'Explain risks, issues and the Week-5 issue story.'},
+  {speaker:'ronith', slide:15, time:'21:30–23:00', title:'Success criteria', desc:'Judge time, scope, quality, cost and acceptance.'},
+  {speaker:'ronith', slide:16, time:'23:00–25:30', title:'Lessons and leadership', desc:'Summarise project lessons and teamwork.'},
+  {speaker:'ronith', slide:17, time:'25:30–29:30', title:'Launch video', desc:'Full-screen finale video moment.'},
+  {speaker:'ronith', slide:18, time:'29:30–30:00', title:'Closing slide', desc:'Team closing line and Q&A invitation.'}
+];
+
+const slideFiles = ['slide_01.png', 'slide_02.png', 'slide_03.png', 'slide_04.png', 'slide_05.png', 'slide_06.png', 'slide_07.png', 'slide_08.png', 'slide_09.png', 'slide_10.png', 'slide_11.png', 'slide_12.png', 'slide_13.png', 'slide_14.png', 'slide_15.png', 'slide_16.png', 'slide_17.png', 'slide_18.png'];
+
+const textureLoader = new THREE.TextureLoader();
+const loadedSlides = slideFiles.map(f => textureLoader.load('./slides/' + f));
+loadedSlides.forEach(t => t.colorSpace = THREE.SRGBColorSpace);
+
+const labelGroup = new THREE.Group();
+const nameLabelGroup = new THREE.Group();
+scene.add(labelGroup, nameLabelGroup);
+
 function mat(color, rough=.72, metal=.05) {
   return new THREE.MeshStandardMaterial({color, roughness:rough, metalness:metal});
 }
@@ -126,17 +244,51 @@ function box(size, pos, color, parent=scene, rot=[0,0,0]) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(...size), mat(color));
   m.position.set(...pos); m.rotation.set(...rot); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
 }
+function plane(size, pos, color, parent=scene, rot=[0,0,0], transparent=false, opacity=1) {
+  const material = new THREE.MeshStandardMaterial({color, side:THREE.DoubleSide, roughness:.68, transparent, opacity});
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(...size), material);
+  mesh.position.set(...pos); mesh.rotation.set(...rot); mesh.receiveShadow = true; parent.add(mesh); return mesh;
+}
+function cylinder(radius, height, pos, color, parent=scene, segments=24) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, segments), mat(color));
+  mesh.position.set(...pos); mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh); return mesh;
+}
+function roundRect(ctx,x,y,w,h,r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function textSprite(text, position, options={}) {
+  const {bg='rgba(11,32,23,.86)', color='#fff', border='#fff', fontSize=42, pad=18, scale=1} = options;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = `800 ${fontSize}px Inter, Arial`;
+  const metrics = ctx.measureText(text);
+  canvas.width = Math.ceil(metrics.width + pad * 2);
+  canvas.height = fontSize + pad * 2;
+  ctx.font = `800 ${fontSize}px Inter, Arial`;
+  ctx.fillStyle = bg; roundRect(ctx,1,1,canvas.width-2,canvas.height-2,16); ctx.fill();
+  ctx.strokeStyle = border; ctx.lineWidth = 3; ctx.stroke();
+  ctx.fillStyle = color; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text, canvas.width/2, canvas.height/2+1);
+  const tex = new THREE.CanvasTexture(canvas); tex.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false}));
+  sprite.position.set(...position);
+  sprite.scale.set((canvas.width/canvas.height)*scale, scale, 1);
+  sprite.renderOrder = 20;
+  return sprite;
+}
 
 const room = new THREE.Group();
 scene.add(room);
 
+// lights
 scene.add(new THREE.HemisphereLight(0xffffff, 0x95b49f, 2.0));
 const sun = new THREE.DirectionalLight(0xffffff, 2.25);
 sun.position.set(9, 16, 10); sun.castShadow = true; sun.shadow.mapSize.set(2048,2048);
 sun.shadow.camera.left=-20; sun.shadow.camera.right=20; sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
 scene.add(sun);
 
-// floor + walls
+// room
 box([18,.3,14],[0,-.15,0],colors.floor,room);
 box([18,6,.28],[0,3,-7],colors.wall,room);
 box([.28,6,14],[-9,3,0],colors.wall,room);
@@ -146,21 +298,339 @@ box([.45,.15,14],[-8.8,5.75,0],colors.green,room);
 box([.45,.15,14],[8.8,5.75,0],colors.green,room);
 box([11,.25,2.1],[0,.12,-5.75],0x365a48,room);
 
+// projector screen
+const screenFrame = box([8.3,3.65,.16],[0,3.35,-6.73],colors.ink,room);
+const screen = plane([7.85,3.2],[0,3.35,-6.63],0xffffff,room);
+const slidePlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(7.7,3.05),
+  new THREE.MeshBasicMaterial({map: loadedSlides[0], toneMapped:false})
+);
+slidePlane.position.set(0,3.35,-6.57);
+room.add(slidePlane);
+labelGroup.add(textSprite('PROJECTOR WALL',[0,5.25,-6.45],{scale:1.08,bg:'rgba(32,146,93,.92)'}));
+
+// posters
+function posterStand(x, title, accentColor, imgPath, labelColor) {
+  const g = new THREE.Group(); g.position.set(x,0,-5.72); room.add(g);
+  box([2.5,2.8,.12],[0,2.08,0],0xffffff,g);
+  box([2.35,.34,.13],[0,3.0,.08],accentColor,g);
+  cylinder(.07,1.55,[-.82,.82,0],colors.ink,g);
+  cylinder(.07,1.55,[.82,.82,0],colors.ink,g);
+  const tex = textureLoader.load('./' + imgPath); tex.colorSpace = THREE.SRGBColorSpace;
+  const posterImg = new THREE.Mesh(new THREE.PlaneGeometry(2.23,2.35), new THREE.MeshBasicMaterial({map:tex, toneMapped:false}));
+  posterImg.position.set(0,2.02,.07); g.add(posterImg);
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.58,2.88), new THREE.MeshBasicMaterial({color:accentColor, transparent:true, opacity:.0}));
+  glow.position.set(0,2.08,-.02); g.add(glow);
+  const label = textSprite(title,[x,4.05,-5.55],{scale:.85,bg:labelColor});
+  labelGroup.add(label);
+  return {group:g, glow, img:posterImg};
+}
+const planPoster = posterStand(-5.8, 'PLAN WALL', colors.green, 'plan_poster.png', 'rgba(32,146,93,.94)');
+const controlPoster = posterStand(5.8, 'CONTROL ROOM', colors.orchid, 'control_poster.png', 'rgba(166,107,210,.94)');
+
+// projector & beam
+const projector = new THREE.Group(); projector.position.set(0,5.3,-.6); room.add(projector);
+box([1.15,.38,.8],[0,0,0],0xf1f1ed,projector);
+box([.3,.25,.12],[0,-.01,-.45],colors.ink,projector);
+cylinder(.07,.65,[0,.48,0],colors.ink,projector);
+const beam = new THREE.Mesh(
+  new THREE.ConeGeometry(2.55,6.2,4,1,true),
+  new THREE.MeshBasicMaterial({color:0xfff0aa, transparent:true, opacity:.075, side:THREE.DoubleSide, depthWrite:false})
+);
+beam.rotation.x = Math.PI/2; beam.position.set(0,3.95,-3.6); beam.scale.x = 1.55; room.add(beam);
+
+// laptop table
+const laptopZone = new THREE.Group(); laptopZone.position.set(-4.3,0,-1.2); room.add(laptopZone);
+box([3.2,.25,1.3],[0,1.15,0],colors.darkWood,laptopZone);
+for(const x of [-1.25,1.25]) for(const z of [-.45,.45]) box([.15,1.15,.15],[x,.57,z],colors.ink,laptopZone);
+const laptop = new THREE.Group(); laptop.position.set(0,1.4,0); laptopZone.add(laptop);
+box([1.2,.08,.75],[0,0,0],0x7b8790,laptop);
+box([1.15,.7,.07],[0,.38,-.33],0x20272b,laptop,[Math.PI/12,0,0]);
+plane([1.0,.56],[0,.4,-.37],0x4da4de,laptop,[Math.PI/12,0,0],true,.82);
+labelGroup.add(textSprite('LAPTOP CONTROL TABLE',[-4.3,2.65,-1.2],{scale:.82,bg:'rgba(239,196,79,.95)',color:'#0b2017',border:'#0b2017'}));
+
+// whiteboard
+const whiteboard = new THREE.Group(); whiteboard.position.set(4.1,0,-1); room.add(whiteboard);
+box([3.5,2.4,.15],[0,2.05,0],0xffffff,whiteboard);
+box([3.6,.16,.2],[0,3.28,0],colors.orchid,whiteboard);
+for(const x of [-1.25,1.25]) cylinder(.07,1.55,[x,.75,0],colors.ink,whiteboard);
+for(const x of [-1.25,1.25]) cylinder(.13,.1,[x,.05,0],colors.ink,whiteboard,16);
+labelGroup.add(textSprite('WHITEBOARD',[4.1,3.85,-1],{scale:.92,bg:'rgba(166,107,210,.94)'}));
+
+// panel
+const panel = new THREE.Group(); panel.position.set(0,0,4.65); room.add(panel);
+box([8.8,.35,1.35],[0,1.15,0],0x654430,panel);
+for(const x of [-3.8,-1.3,1.3,3.8]) box([.16,1.15,.16],[x,.55,.45],colors.ink,panel);
+labelGroup.add(textSprite('VIVA PANEL',[0,3.75,4.65],{scale:1.06,bg:'rgba(223,107,112,.92)'}));
+
+function makePerson(color, name='') {
+  const g = new THREE.Group();
+  cylinder(.34,1.0,[0,1.05,0],color,g,24);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.27,24,18), mat(0xe7b98f));
+  head.position.set(0,1.82,0); head.castShadow = true; g.add(head);
+  for(const x of [-.17,.17]) cylinder(.09,.75,[x,.38,0],colors.ink,g,14);
+  for(const x of [-.43,.43]) {
+    const arm = cylinder(.07,.72,[x,1.12,0],0xe7b98f,g,14);
+    arm.rotation.z = x < 0 ? -.28 : .28;
+  }
+  if(name){
+    const s = textSprite(name,[0,2.45,0],{scale:.52,bg:'rgba(11,32,23,.9)'});
+    g.add(s); s.name = 'nameTag';
+  }
+  return g;
+}
+
+for(let i=0;i<3;i++){
+  const pc = i===1?colors.orchid:(i===0?colors.sky:colors.green);
+  const person = makePerson(pc);
+  person.position.set((i-1)*2.55,0,0); person.rotation.y = Math.PI; panel.add(person);
+  box([1.35,.78,.09],[(i-1)*2.55,1.8,-.28],0x253138,panel);
+  plane([1.15,.58],[(i-1)*2.55,1.8,-.34],0xa8daf0,panel,[0,0,0],true,.95);
+}
+
+const leftQueueGroup = new THREE.Group(); leftQueueGroup.position.set(-7.15,0,1.3); room.add(leftQueueGroup);
+const rightQueueGroup = new THREE.Group(); rightQueueGroup.position.set(7.15,0,1.3); room.add(rightQueueGroup);
+labelGroup.add(textSprite('WAITING ZONE',[ -7.05,3.25,1.3],{scale:.74,bg:'rgba(77,164,222,.92)'}));
+labelGroup.add(textSprite('WAITING ZONE',[  7.05,3.25,1.3],{scale:.74,bg:'rgba(77,164,222,.92)'}));
+
+const queueSlots = {
+  sithum:   { parent: leftQueueGroup,  pos:[0,0,-1.7] },
+  nadeera:  { parent: leftQueueGroup,  pos:[0,0, 0.0] },
+  ronith:   { parent: leftQueueGroup,  pos:[0,0, 1.7] },
+  yasali:   { parent: rightQueueGroup, pos:[0,0,-0.9] },
+  rashandi: { parent: rightQueueGroup, pos:[0,0, 0.9] }
+};
+
+const peopleMap = {};
+presenters.forEach((p)=>{
+  const person = makePerson(p.color, p.name.split(' ')[0]);
+  const slot = queueSlots[p.id];
+  person.rotation.y = p.id === 'yasali' || p.id === 'rashandi' ? -Math.PI/2 : Math.PI/2;
+  person.position.set(...slot.pos);
+  slot.parent.add(person);
+  peopleMap[p.id] = person;
+});
+const activePresenter = new THREE.Group();
+room.add(activePresenter);
+
+// door
+const doorPivot = new THREE.Group(); doorPivot.position.set(7.35,0,-6.78); room.add(doorPivot);
+box([2.2,4.3,.15],[1.1,2.15,0],colors.sky,doorPivot);
+box([1.75,3.7,.08],[1.1,2.15,-.1],0xd7ecf7,doorPivot);
+cylinder(.09,.14,[.35,2.18,-.17],colors.gold,doorPivot,18);
+labelGroup.add(textSprite('DOOR',[7.8,5.0,-6.45],{scale:.78,bg:'rgba(77,164,222,.94)'}));
+
+// rug
+plane([10,5.2],[0,.02,-2.8],0x7ad9a8,room,[-Math.PI/2,0,0],true,.27);
+
+// path
+const curve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(0,.035,2.35),
+  new THREE.Vector3(-3.0,.035,-1.2),
+  new THREE.Vector3(-5.6,.035,-4.65),
+  new THREE.Vector3(0,.035,-3.4),
+  new THREE.Vector3(5.6,.035,-4.65),
+  new THREE.Vector3(4.1,.035,-2.1),
+  new THREE.Vector3(0,.035,-3.4)
+]);
+const pathMesh = new THREE.Mesh(
+  new THREE.TubeGeometry(curve,80,.045,8,false),
+  new THREE.MeshBasicMaterial({color:colors.gold, transparent:true, opacity:.88})
+);
+room.add(pathMesh);
+
+// optional sketch plane on side wall for reference
+const sketchTex = textureLoader.load('./sketch.png'); sketchTex.colorSpace = THREE.SRGBColorSpace; const sketchPlane = new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.4), new THREE.MeshBasicMaterial({map:sketchTex, toneMapped:false})); sketchPlane.position.set(-8.84,2.35,4.6); sketchPlane.rotation.y = Math.PI/2; room.add(sketchPlane); labelGroup.add(textSprite('ORIGINAL ROOM SKETCH',[-8.1,4.1,4.6],{scale:.74,bg:'rgba(77,164,222,.95)'}));
+
 const views = {
   iso:{pos:[18,15,20], target:[0,1.5,0]},
   top:{pos:[0,25,.01], target:[0,0,0]},
+  presenter:{pos:[0,2.25,-1.8], target:[0,2.8,-6.7]},
   panel:{pos:[0,3.1,6.9], target:[0,2.2,-5.8]},
-  screen:{pos:[0,5.0,7.8], target:[0,2.8,-6.6]}
+  screen:{pos:[0,5.0,7.8], target:[0,2.8,-6.6]},
 };
+
+function tweenCamera(pos,target,duration=800){
+  const startP = camera.position.clone();
+  const startT = controls.target.clone();
+  const endP = new THREE.Vector3(...pos);
+  const endT = new THREE.Vector3(...target);
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1,(now-t0)/duration);
+    const e = 1 - Math.pow(1-t,3);
+    camera.position.lerpVectors(startP,endP,e);
+    controls.target.lerpVectors(startT,endT,e);
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 function setView(key){
   const v = views[key];
   if(!v) return;
-  camera.position.set(...v.pos);
-  controls.target.set(...v.target);
+  tweenCamera(v.pos, v.target, 700);
   document.querySelectorAll('[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view===key));
 }
 document.querySelectorAll('[data-view]').forEach(btn => btn.addEventListener('click',()=>setView(btn.dataset.view)));
+
+function updateSlide(n){
+  const idx = Math.max(1, Math.min(loadedSlides.length, n)) - 1;
+  slidePlane.material.map = loadedSlides[idx];
+  slidePlane.material.needsUpdate = true;
+}
+
+function getPresenter(id) {
+  return presenters.find(p => p.id === id);
+}
+
+function highlightPoster(which){
+  planPoster.glow.material.opacity = which === 'plan' ? .15 : .0;
+  controlPoster.glow.material.opacity = which === 'control' ? .15 : .0;
+}
+
+function movePersonToFront(id, duration=700){
+  const person = peopleMap[id];
+  const p = getPresenter(id);
+  if(!person || !p) return;
+  // return everyone else to their side waiting zones
+  presenters.forEach((pr) => {
+    const per = peopleMap[pr.id];
+    const slot = queueSlots[pr.id];
+    if(pr.id !== id && slot){
+      moveObject(per, slot.pos, 500, slot.parent);
+      per.rotation.y = pr.id === 'yasali' || pr.id === 'rashandi' ? -Math.PI/2 : Math.PI/2;
+    }
+  });
+  moveObject(person, p.pos, duration, room);
+  person.rotation.y = 0;
+  activePresenter.add(person);
+}
+
+function moveObject(obj, pos, duration=650, parent=null){
+  if(parent && obj.parent !== parent){
+    const worldPos = new THREE.Vector3();
+    obj.getWorldPosition(worldPos);
+    parent.add(obj);
+    obj.position.copy(parent.worldToLocal(worldPos));
+  }
+  const start = obj.position.clone();
+  const end = new THREE.Vector3(...pos);
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1,(now-t0)/duration);
+    const e = t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+    obj.position.lerpVectors(start, end, e);
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function setActiveSpeaker(id){
+  const p = getPresenter(id);
+  if(!p) return;
+  document.getElementById('speakerName').textContent = p.name;
+  document.getElementById('speakerDetail').textContent = `Slides ${p.slides[0]}–${p.slides[1]} · ${p.role}`;
+  document.querySelectorAll('.speakerBtn').forEach(el => el.classList.toggle('active', el.dataset.id===id));
+}
+
+const speakerButtons = document.getElementById('speakerButtons');
+presenters.forEach(p => {
+  const b = document.createElement('button');
+  b.className = 'speakerBtn';
+  b.dataset.id = p.id;
+  b.innerHTML = `<span class="speakerSwatch" style="background:#${p.color.toString(16).padStart(6,'0')}"></span>
+    <span class="speakerMeta"><strong>${p.name}</strong><span>Slides ${p.slides[0]}–${p.slides[1]} · ${p.role}</span></span>`;
+  b.addEventListener('click', ()=> {
+    setActiveSpeaker(p.id);
+    movePersonToFront(p.id);
+    highlightPoster(p.focus==='plan'?'plan':(p.focus==='control'?'control':''));
+    updateSlide(p.slides[0]);
+    setView(p.focus==='screen'?'screen':'iso');
+  });
+  speakerButtons.appendChild(b);
+});
+
+const stepList = document.getElementById('stepList');
+steps.forEach((s, idx) => {
+  const step = document.createElement('div');
+  step.className = 'step';
+  step.dataset.index = idx;
+  step.innerHTML = `<div class="time">${s.time}</div><div class="title">${s.title}</div><div class="desc">${getPresenter(s.speaker).name} · Slide ${s.slide} · ${s.desc}</div>`;
+  step.addEventListener('click', ()=>activateStep(idx));
+  stepList.appendChild(step);
+});
+
+let currentStep = 0;
+let playing = false;
+
+function activateStep(index, options={}){
+  const preserveView = options.preserveView || false;
+  currentStep = Math.max(0, Math.min(steps.length-1, index));
+  const s = steps[currentStep];
+  const p = getPresenter(s.speaker);
+  setActiveSpeaker(s.speaker);
+  updateSlide(s.slide);
+  movePersonToFront(s.speaker, 650);
+  highlightPoster(p.focus==='plan' ? 'plan' : p.focus==='control' ? 'control' : '');
+  if(!preserveView){
+    const desiredView = p.focus==='screen' ? (s.slide===17 ? 'panel' : 'screen') : 'iso';
+    setView(desiredView);
+  }
+  document.querySelectorAll('.step').forEach((el, i)=>el.classList.toggle('active', i===currentStep));
+}
+
+async function playAll(){
+  if(playing) return;
+  playing = true;
+  setView('iso');
+  const progress = document.getElementById('progress');
+  progress.style.display = 'block';
+  const bar = progress.querySelector('span');
+  for(let i=0;i<steps.length;i++){
+    if(!playing) break;
+    activateStep(i, {preserveView:true});
+    bar.style.width = (((i+1)/steps.length)*100).toFixed(1) + '%';
+    await new Promise(r=>setTimeout(r, 1350));
+  }
+  playing = false;
+  setTimeout(()=>{progress.style.display='none';bar.style.width='0%';}, 400);
+}
+document.getElementById('playAll').addEventListener('click', playAll);
+document.getElementById('nextStep').addEventListener('click', ()=>activateStep((currentStep+1)%steps.length));
+document.getElementById('resetScene').addEventListener('click', ()=>{
+  playing = false;
+  activateStep(0);
+  setView('iso');
+});
+
+document.getElementById('focusScreen').addEventListener('click', ()=>setView('screen'));
+document.getElementById('focusPanel').addEventListener('click', ()=>setView('panel'));
+
+let labelsVisible = true, beamVisible = true, pathVisible = true, namesVisible = true;
+document.getElementById('labelsBtn').addEventListener('click', e=>{
+  labelsVisible = !labelsVisible; labelGroup.visible = labelsVisible;
+  e.currentTarget.classList.toggle('active', labelsVisible);
+  e.currentTarget.textContent = labelsVisible ? 'Labels on' : 'Labels off';
+});
+document.getElementById('beamBtn').addEventListener('click', e=>{
+  beamVisible = !beamVisible; beam.visible = beamVisible;
+  e.currentTarget.classList.toggle('active', beamVisible);
+  e.currentTarget.textContent = beamVisible ? 'Beam on' : 'Beam off';
+});
+document.getElementById('pathBtn').addEventListener('click', e=>{
+  pathVisible = !pathVisible; pathMesh.visible = pathVisible;
+  e.currentTarget.classList.toggle('active', pathVisible);
+  e.currentTarget.textContent = pathVisible ? 'Path on' : 'Path off';
+});
+document.getElementById('namesBtn').addEventListener('click', e=>{
+  namesVisible = !namesVisible;
+  leftQueueGroup.traverse(obj => { if(obj.name === 'nameTag') obj.visible = namesVisible; });
+  rightQueueGroup.traverse(obj => { if(obj.name === 'nameTag') obj.visible = namesVisible; });
+  activePresenter.traverse(obj => { if(obj.name === 'nameTag') obj.visible = namesVisible; });
+  e.currentTarget.classList.toggle('active', namesVisible);
+  e.currentTarget.textContent = namesVisible ? 'Names on' : 'Names off';
+});
 
 window.addEventListener('resize', ()=> {
   camera.aspect = innerWidth/innerHeight;
@@ -174,6 +644,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+activateStep(0);
 setView('iso');
 </script>
 </body>
