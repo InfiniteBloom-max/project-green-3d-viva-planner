@@ -9,6 +9,7 @@ Interactive Three.js rehearsal scene for the Project Green viva presentation.
 - Clickable presentation timeline (30-minute flow)
 - Camera views: isometric, top plan, presenter, panel, projector wall
 - Scene toggles: labels, projector beam, movement path, name tags
+- **Side waiting zones** so the center stays clear for the viva panel
 
 ## Presenters
 1. **Sithum Nimhan** — slides 1–4 · opening, problem, objectives, scope
@@ -23,3 +24,8 @@ Open `index.html` via a local static server (Three.js ES modules need HTTP).
 ## Stack
 - Vanilla HTML + CSS + ES modules
 - Three.js 0.160 (jsDelivr CDN)
+
+## Changelog
+### v3
+- Presenter waiting positions moved to left and right side zones
+- Middle area kept clear so the viva panel can see the active speaker

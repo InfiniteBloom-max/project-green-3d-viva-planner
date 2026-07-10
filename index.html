@@ -494,7 +494,7 @@ function movePersonToFront(id, duration=700){
   const person = peopleMap[id];
   const p = getPresenter(id);
   if(!person || !p) return;
-  // return everyone else to their side waiting zones
+  // v3: park non-active presenters in left/right waiting zones
   presenters.forEach((pr) => {
     const per = peopleMap[pr.id];
     const slot = queueSlots[pr.id];
