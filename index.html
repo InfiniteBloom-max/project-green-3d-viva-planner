@@ -116,6 +116,7 @@
     <button data-view="presenter">Presenter</button>
     <button data-view="panel">Panel view</button>
     <button data-view="screen">Projector wall</button>
+    <button data-view="fixed">Fixed timelapse view</button>
   </div>
 
   <h3>Presenters</h3>
@@ -139,7 +140,7 @@
 
   <div class="footerNote">
     Drag to orbit · Scroll to zoom · Right-drag to pan.<br>
-    The screen shows the active slide, the correct poster is highlighted, and the non-active presenters wait at the side zones. Play the full timelapse to step through every presenter, slide and poster focus in sequence.
+    The screen shows the active slide, the correct poster is highlighted, and the non-active presenters wait at the side zones. The full timelapse now stays on a fixed corner camera so every major detail remains visible throughout the rehearsal.
   </div>
 </aside>
 
@@ -449,6 +450,7 @@ const views = {
   presenter:{pos:[0,2.25,-1.8], target:[0,2.8,-6.7]},
   panel:{pos:[0,3.1,6.9], target:[0,2.2,-5.8]},
   screen:{pos:[0,5.0,7.8], target:[0,2.8,-6.6]},
+  fixed:{pos:[8.8,9.4,9.8], target:[0,2.1,-1.4]}
 };
 
 function tweenCamera(pos,target,duration=800){
@@ -584,7 +586,7 @@ function activateStep(index, options={}){
 async function playAll(){
   if(playing) return;
   playing = true;
-  setView('iso');
+  setView('fixed');
   const progress = document.getElementById('progress');
   progress.style.display = 'block';
   const bar = progress.querySelector('span');
