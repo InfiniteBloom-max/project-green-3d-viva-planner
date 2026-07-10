@@ -1,3 +1,3 @@
 # Presentation slides
-Extracted from the Project Green viva deck PDF.
-Slides 1–9 added (opening through execution evidence).
+Extracted from the Project Green viva deck PDF (18 slides total).
+Wired to the projector wall during the presentation timelapse.
