@@ -14,12 +14,17 @@ Interactive Three.js rehearsal scene for the **Project Green** viva: slides, pos
 
 ## Demo video
 
-Full walkthrough of the 3D viva rehearsal planner (screen recording):
+Full walkthrough of the 3D viva rehearsal planner (autoplays in the README):
 
-https://github.com/InfiniteBloom-max/project-green-3d-viva-planner/blob/main/docs/demo/viva-rehearsal-walkthrough.mp4
+<p align="center">
+  <img src="docs/demo/walkthrough.gif" alt="Project Green 3D viva rehearsal planner walkthrough" width="100%" />
+</p>
 
-> Click the link above, then press **play** on GitHub’s video player.  
-> Or download the file from [`docs/demo/viva-rehearsal-walkthrough.mp4`](docs/demo/viva-rehearsal-walkthrough.mp4).
+<p align="center">
+  <a href="https://github.com/InfiniteBloom-max/project-green-3d-viva-planner/releases/download/demo/viva-rehearsal-walkthrough.mp4"><b>▶ Download / play full HD MP4</b></a>
+  ·
+  <a href="https://infinitebloom-max.github.io/project-green-3d-viva-planner/">Open live site</a>
+</p>
 
 ---
 
