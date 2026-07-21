@@ -6,13 +6,13 @@
 </p>
 
 <p align="center">
-  <a href="https://infinitebloom-max.github.io/project-green-3d-viva-planner/"><img src="https://img.shields.io/badge/Live%20demo-GitHub%20Pages-20925d?style=for-the-badge" alt="Live demo" /></a>
+  <a href="https://ronithrashmikara.github.io/project-green-3d-viva-planner/"><img src="https://img.shields.io/badge/Live%20demo-GitHub%20Pages-20925d?style=for-the-badge" alt="Live demo" /></a>
   <img src="https://img.shields.io/badge/Three.js-0.160-black?style=for-the-badge" alt="Three.js" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License" />
 </p>
 
 <p align="center">
-  <b>Live site:</b> <a href="https://infinitebloom-max.github.io/project-green-3d-viva-planner/">https://infinitebloom-max.github.io/project-green-3d-viva-planner/</a>
+  <b>Live site:</b> <a href="https://ronithrashmikara.github.io/project-green-3d-viva-planner/">https://ronithrashmikara.github.io/project-green-3d-viva-planner/</a>
 </p>
 
 ---
@@ -28,9 +28,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/InfiniteBloom-max/project-green-3d-viva-planner/releases/download/demo/viva-rehearsal-walkthrough.mp4"><b>▶ Download / play full HD MP4</b></a>
+  <a href="https://github.com/ronithrashmikara/project-green-3d-viva-planner/releases/download/demo/viva-rehearsal-walkthrough.mp4"><b>▶ Download / play full HD MP4</b></a>
   ·
-  <a href="https://infinitebloom-max.github.io/project-green-3d-viva-planner/">Open live site</a>
+  <a href="https://ronithrashmikara.github.io/project-green-3d-viva-planner/">Open live site</a>
 </p>
 
 ---
@@ -131,4 +131,4 @@ python -m http.server 8080
 
 ---
 
-Built for Project Green viva rehearsal · [InfiniteBloom-max](https://github.com/InfiniteBloom-max)
+Built for Project Green viva rehearsal · [ronithrashmikara](https://github.com/ronithrashmikara)
